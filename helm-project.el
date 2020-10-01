@@ -24,7 +24,6 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'helm)
-(require 'helm)
 (require 'helm-source)
 (require 'helm-types)
 (require 'helm-buffers)
@@ -69,7 +68,9 @@
 	       "Switch to Project"
 	       (lambda (candidate)
 		 (with-helm-default-directory candidate
-		   (helm-project)))))
+		   (helm-project)))
+	       "Search Project"
+	       'helm-project-grep-ag-action))
    (volatile :initform t)))
 
 (defun helm-project-list-projects ()
@@ -103,6 +104,14 @@
    :buffer "*helm project buffers*"
    :sources '(helm-project-source-project-buffers)
    :truncate-lines t))
+
+(defun helm-project-grep-ag (arg)
+  (interactive "P")
+  (with-helm-default-directory (cdr (project-current))
+    (helm-do-grep-ag arg)))
+
+(defun helm-project-grep-ag-action (_c)
+  (helm-project-grep-ag nil))
 
 (defun helm-project ()
   (interactive)
