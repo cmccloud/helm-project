@@ -43,6 +43,36 @@
 			  #'string-match-p)))
    (mapcar #'buffer-name (project--buffer-list (project-current)))))
 
+(defvar helm-project-files-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-find-files-map)
+    (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
+    map))
+
+(defvar helm-project-buffer-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-buffer-map)
+    (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
+    map))
+
+(defvar helm-project-projects-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
+    map))
+
+(defun helm-project-grep-ag (arg)
+  (interactive "P")
+  (with-helm-default-directory (cdr (project-current))
+    (helm-do-grep-ag arg)))
+
+(defun helm-project-grep-ag-action (_c)
+  (helm-project-grep-ag nil))
+
+(defun helm-project-do-grep-ag ()
+  (interactive)
+  (helm-exit-and-execute-action 'helm-project-grep-ag-action))
+
 (defclass helm-project-project-buffer-source (helm-source-buffers helm-type-buffer)
   ((buffer-list
     :initarg :buffer-list
@@ -54,7 +84,6 @@
 (defclass helm-project-project-files-source (helm-source-sync helm-type-file)
   ((candidates
     :initform (lambda () (project-files (project-current))))
-   (keymap :initform helm-find-files-map)
    (volatile :initform t)))
 
 (defclass helm-project-project-source (helm-source-sync)
@@ -69,9 +98,26 @@
 	       (lambda (candidate)
 		 (with-helm-default-directory candidate
 		   (helm-project)))
-	       "Search Project"
+	       "Grep project with AG `M-g a, C-u select type' "
 	       'helm-project-grep-ag-action))
-   (volatile :initform t)))
+   (volatile :initform t)
+   (keymap :initform helm-project-projects-map)))
+
+(cl-defmethod helm--setup-source ((source helm-project-project-files-source))
+  (cl-call-next-method)
+  (setf (slot-value source 'action)
+        (append (symbol-value (slot-value source 'action))
+                (helm-make-actions "Grep project with AG `M-g a, C-u select type' "
+				   'helm-project-grep-ag-action)))
+  (setf (slot-value source 'keymap) helm-project-files-map))
+
+(cl-defmethod helm--setup-source ((source helm-project-project-buffer-source))
+  (cl-call-next-method)
+  (setf (slot-value source 'action)
+        (append (symbol-value (slot-value source 'action))
+                (helm-make-actions "Grep project with AG `M-g a, C-u select type' " 
+				   'helm-project-grep-ag-action)))
+  (setf (slot-value source 'keymap) helm-project-buffer-map))
 
 (defun helm-project-list-projects ()
   (interactive)
@@ -105,14 +151,6 @@
    :sources '(helm-project-source-project-buffers)
    :truncate-lines t))
 
-(defun helm-project-grep-ag (arg)
-  (interactive "P")
-  (with-helm-default-directory (cdr (project-current))
-    (helm-do-grep-ag arg)))
-
-(defun helm-project-grep-ag-action (_c)
-  (helm-project-grep-ag nil))
-
 (defun helm-project ()
   (interactive)
   (unless (bound-and-true-p helm-project-source-project-files)
@@ -138,7 +176,6 @@
 (provide 'helm-project)
 
 ;; TODO: Add Project.el Support to Treemacs
-;; TODO: Build Search in Project Functionality
 ;; helm-project.el ends here
 
 
