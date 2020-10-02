@@ -28,6 +28,7 @@
 (require 'helm-types)
 (require 'helm-buffers)
 (require 'helm-for-files)
+(require 'project)
 
 (defvar helm-project-source-project-files nil)
 
@@ -81,27 +82,18 @@
     :documentation
     "A function with no arguments to create buffer list.")))
 
+(cl-defmethod helm--setup-source ((source helm-project-project-buffer-source))
+  (cl-call-next-method)
+  (setf (slot-value source 'action)
+        (append (symbol-value (slot-value source 'action))
+                (helm-make-actions "Grep project with AG `M-g a, C-u select type' " 
+				   'helm-project-grep-ag-action)))
+  (setf (slot-value source 'keymap) helm-project-buffer-map))
+
 (defclass helm-project-project-files-source (helm-source-sync helm-type-file)
   ((candidates
-    :initform (lambda () (project-files (project-current))))
+    :initform (lambda () (ignore-errors (project-files (project-current)))))
    (volatile :initform t)))
-
-(defclass helm-project-project-source (helm-source-sync)
-  ((candidates
-    :initform (lambda ()
-		(with-temp-buffer
-		  (insert-file-contents project-list-file)
-		  (read (current-buffer)))))
-   (action
-    :initform (helm-make-actions
-	       "Switch to Project"
-	       (lambda (candidate)
-		 (with-helm-default-directory candidate
-		   (helm-project)))
-	       "Grep project with AG `M-g a, C-u select type' "
-	       'helm-project-grep-ag-action))
-   (volatile :initform t)
-   (keymap :initform helm-project-projects-map)))
 
 (cl-defmethod helm--setup-source ((source helm-project-project-files-source))
   (cl-call-next-method)
@@ -111,13 +103,31 @@
 				   'helm-project-grep-ag-action)))
   (setf (slot-value source 'keymap) helm-project-files-map))
 
-(cl-defmethod helm--setup-source ((source helm-project-project-buffer-source))
-  (cl-call-next-method)
-  (setf (slot-value source 'action)
-        (append (symbol-value (slot-value source 'action))
-                (helm-make-actions "Grep project with AG `M-g a, C-u select type' " 
-				   'helm-project-grep-ag-action)))
-  (setf (slot-value source 'keymap) helm-project-buffer-map))
+(defun helm-project-switch-to-project (candidate)
+  (let* ((dir (if (string-equal candidate "* Select New Project *")
+		  (read-directory-name "Select Project Directory")
+		candidate))
+	 (pr (project--find-in-directory dir)))
+    (if pr (project-remember-project pr)
+      (project--remove-from-project-list dir))
+    (with-helm-default-directory dir
+      (helm-project))))
+
+(defclass helm-project-project-source (helm-source-sync)
+  ((candidates
+    :initform (lambda ()
+		(append (with-temp-buffer
+			  (insert-file-contents project-list-file)
+			  (read (current-buffer)))
+			'("* Select New Project *"))))
+   (action
+    :initform (helm-make-actions
+	       "Switch to Project"
+	       'helm-project-switch-to-project
+	       "Grep project with AG `M-g a, C-u select type' "
+	       'helm-project-grep-ag-action))
+   (volatile :initform t)
+   (keymap :initform helm-project-projects-map)))
 
 (defun helm-project-list-projects ()
   (interactive)
@@ -175,6 +185,7 @@
 
 (provide 'helm-project)
 
+;; TODO: Add browse to new project
 ;; TODO: Add Project.el Support to Treemacs
 ;; helm-project.el ends here
 
