@@ -148,8 +148,7 @@
 
 (defclass helm-project-file-source (helm-source-sync helm-type-file)
   ((candidates
-    :initform 'helm-project-find-files)
-   (volatile :initform t)))
+    :initform 'helm-project-find-files)))
 
 (cl-defmethod helm--setup-source ((source helm-project-file-source))
   (cl-call-next-method)
@@ -171,7 +170,6 @@
 	       'helm-project-switch-to-project
 	       "Search project with Grep or AG `M-g a' "
 	       'helm-project-grep-ag-action))
-   (volatile :initform t)
    (keymap :initform helm-project-projects-map)))
 
 ;;; User Facing Commands 
