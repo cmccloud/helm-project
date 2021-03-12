@@ -21,6 +21,10 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
+;;; Commentary:
+;;
+;; Helm frontend for project.el
+;; 
 ;;; Code:
 (require 'cl-lib)
 (require 'seq)
@@ -65,7 +69,13 @@
     map))
 
 (defun helm-project--project-buffer-list ()
-  (cl-loop for buf in (project--buffer-list (project-current))
+  (cl-loop for buf in
+	   (append (project--buffer-list (project-current))
+		   (when helm-project-external-flag
+		     (seq-mapcat (lambda (root)
+				   (project--buffer-list
+				    (project-current nil root)))
+				 (project-external-roots (project-current)))))
 	   when (not (seq-contains-p helm-boring-buffer-regexp-list
 				     (buffer-name buf)
 				     #'string-match-p))
