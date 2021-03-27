@@ -1,6 +1,6 @@
 ;; helm-project.el --- Helm source for project management. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020 Christopher McCloud
+;; Copyright (C) 2020-2021 Christopher McCloud
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -104,11 +104,12 @@
       (helm-do-grep-ag arg))))
 
 (defun helm-project-grep-ag-action (_c)
-  (helm-project-grep-ag nil))
+  (helm-project-grep-ag helm-current-prefix-arg))
 
 (defun helm-project-do-grep-ag ()
   (interactive)
-  (helm-exit-and-execute-action 'helm-project-grep-ag-action))
+  (with-helm-alive-p
+    (helm-exit-and-execute-action 'helm-project-grep-ag-action)))
 
 (defun helm-project-switch-to-project (candidate)
   (let* ((dir (if (string-equal candidate "* Select New Project *")
@@ -148,7 +149,11 @@
 
 (defclass helm-project-file-source (helm-source-sync helm-type-file)
   ((candidates
-    :initform 'helm-project-find-files)))
+    :initform 'helm-project-find-files)
+   ;; BUG: Why does this not work when using the project-treemacs backend?
+   (match-part :initform (lambda (candidate)
+			   (if helm-ff-transformer-show-only-basename
+			       (helm-basename candidate) candidate)))))
 
 (cl-defmethod helm--setup-source ((source helm-project-file-source))
   (cl-call-next-method)
@@ -189,10 +194,9 @@
     (setq helm-project-source-files
 	  (helm-make-source "Project Files"
 	      helm-project-file-source)))
-  (let ((helm-ff-transformer-show-only-basename nil))
-    (helm
-     :buffer "*helm project files*"
-     :sources '(helm-project-source-files))))
+  (helm
+   :buffer "*helm project files*"
+   :sources '(helm-project-source-files)))
 
 (defun helm-project-buffers ()
   (interactive)
@@ -220,12 +224,14 @@
 	  (helm-make-source "Projects"
 	      helm-project-project-source)))
   (helm
-   :buffer "*helm project*"
+   :buffer "*Helm Project*"
    :sources '(helm-project-source-buffers
 	      helm-project-source-files
 	      helm-project-source-projects)
    :truncate-lines t
-   :ff-transformer-show-only-basename nil))
+   :ff-transformer-show-only-basename nil
+   :resume nil
+   :candidate-number-limit 100))
 
 (provide 'helm-project)
 
