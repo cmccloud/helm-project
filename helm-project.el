@@ -150,7 +150,7 @@
 (defclass helm-project-file-source (helm-source-sync helm-type-file)
   ((candidates
     :initform 'helm-project-find-files)
-   ;; BUG: Why does this not work when using the project-treemacs backend?
+   ;; BUG: Why does partial matching not work with project-treemacs backend?
    (match-part :initform (lambda (candidate)
 			   (if helm-ff-transformer-show-only-basename
 			       (helm-basename candidate) candidate)))))
@@ -177,7 +177,9 @@
 	       'helm-project-grep-ag-action))
    (keymap :initform helm-project-projects-map)))
 
-;;; User Facing Commands 
+;;; User Facing Commands
+
+;;;###autoload
 (defun helm-project-list-projects ()
   (interactive)
   (unless (bound-and-true-p helm-project-source-projects)
@@ -188,6 +190,7 @@
    :buffer "*helm projects*"
    :sources '(helm-project-source-projects)))
 
+;;;###autoload
 (defun helm-project-files ()
   (interactive)
   (unless (bound-and-true-p helm-project-source-files)
@@ -198,6 +201,7 @@
    :buffer "*helm project files*"
    :sources '(helm-project-source-files)))
 
+;;;###autoload
 (defun helm-project-buffers ()
   (interactive)
   (unless (bound-and-true-p helm-project-source-buffers)
@@ -209,6 +213,7 @@
    :sources '(helm-project-source-buffers)
    :truncate-lines t))
 
+;;;###autoload
 (defun helm-project ()
   (interactive)
   (unless (bound-and-true-p helm-project-source-files)
