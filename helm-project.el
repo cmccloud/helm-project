@@ -73,8 +73,9 @@
 	   (append (project--buffer-list (project-current))
 		   (when helm-project-external-flag
 		     (seq-mapcat (lambda (root)
-				   (project--buffer-list
-				    (project-current nil root)))
+				   (ignore-errors
+				     (project--buffer-list
+				      (project-current nil root))))
 				 (project-external-roots (project-current)))))
 	   when (not (seq-contains-p helm-boring-buffer-regexp-list
 				     (buffer-name buf)
