@@ -70,11 +70,11 @@
 
 (defun helm-project--project-buffer-list ()
   (cl-loop for buf in
-	   (append (project--buffer-list (project-current))
+	   (append (project-buffers (project-current))
 		   (when helm-project-external-flag
 		     (seq-mapcat (lambda (root)
 				   (ignore-errors
-				     (project--buffer-list
+				     (project-buffers
 				      (project-current nil root))))
 				 (project-external-roots (project-current)))))
 	   when (not (seq-contains-p helm-boring-buffer-regexp-list
