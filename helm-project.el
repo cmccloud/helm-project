@@ -69,18 +69,25 @@
     map))
 
 (defun helm-project--project-buffer-list ()
-  (cl-loop for buf in
-	   (append (project-buffers (project-current))
-		   (when helm-project-external-flag
-		     (seq-mapcat (lambda (root)
-				   (ignore-errors
-				     (project-buffers
-				      (project-current nil root))))
-				 (project-external-roots (project-current)))))
-	   when (not (seq-contains-p helm-boring-buffer-regexp-list
-				     (buffer-name buf)
-				     #'string-match-p))
-	   collect (buffer-name buf)))
+  (let ((visible-bufs (helm-buffers-get-visible-buffers))
+        (project-root-bufs (project-buffers (project-current)))
+        (external-roots-bufs
+         (when helm-project-external-flag
+           (seq-mapcat (lambda (root)
+			 (ignore-errors
+			   (project-buffers
+			    (project-current nil root))))
+		       (project-external-roots (project-current))))))
+    (cl-loop for buf in (append project-root-bufs external-roots-bufs) 
+             ;; Divide project buffers into visible and not-visible groups
+             when (memq (buffer-name buf) visible-bufs)
+             collect (buffer-name buf) into visible-in-project
+             else
+             collect (buffer-name buf) into other-in-project
+             ;; Sort buffers, same as `helm-buffers-list'
+	     finally return (funcall helm-buffer-list-reorder-fn
+                                     visible-in-project
+                                     other-in-project))))
 
 (defun helm-project-toggle-external-flag ()
   (interactive)
