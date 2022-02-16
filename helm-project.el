@@ -158,7 +158,6 @@
 (defclass helm-project-file-source (helm-source-sync helm-type-file)
   ((candidates
     :initform 'helm-project-find-files)
-   ;; BUG: Why does partial matching not work with project-treemacs backend?
    (match-part :initform (lambda (candidate)
 			   (if helm-ff-transformer-show-only-basename
 			       (helm-basename candidate) candidate)))))
