@@ -12,16 +12,22 @@ This package provides a Helm interface for the built in project.el Emacs library
 
 [Project.el Emacs Mirror](https://github.com/emacs-mirror/emacs/blob/master/lisp/progmodes/project.el)
 
-## Screenshots
-![helm-project](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project.gif?raw=true)
+## Examples
+![helm-project-files](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project.gif?raw=true)
+Using `helm-project` to find a project file.
+
+
 ## Commands
-`helm-project-list-projects`
+`helm-project-list-projects` - project-switch-project
 
-`helm-project-files`
+`helm-project-files` - project-find-files
 
-`helm-project-buffers`
+`helm-project-buffers` - project-switch-to-buffer
 
-`helm-project` This is the main entry point, and combines above three helm sources into a single interface.
+`helm-project-grep-ag` - project-find-regexp
+
+`helm-project` - This is the main entry point, and combines above three helm sources into a single interface.
+
 ## Installing
 Clone this repository and install using `use-package`
 
