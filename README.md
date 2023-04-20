@@ -13,7 +13,7 @@ This package provides a Helm interface for the built in project.el Emacs library
 [Project.el Emacs Mirror](https://github.com/emacs-mirror/emacs/blob/master/lisp/progmodes/project.el)
 
 ## Screenshots
-
+![helm-project](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project.gif?raw=true)
 ## Commands
 `helm-project-list-projects`
 
