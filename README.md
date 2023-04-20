@@ -16,6 +16,9 @@ This package provides a Helm interface for the built in project.el Emacs library
 ![helm-project-files](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project.gif?raw=true)
 Using `helm-project` to find a project file.
 
+![helm-project-grep-ag](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-grep-ag.gif?raw=true)
+Using helm-project-grep-ag within `helm-project` to locate a definition within a project (bound by default to `M-g a` as per helm conventions).
+
 
 ## Commands
 `helm-project-list-projects` - project-switch-project
