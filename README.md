@@ -33,6 +33,11 @@ Bound by default to `M-g a` when within a helm buffer, as per helm conventions.
 ![helm-project-file-actions](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-file-actions.gif?raw=true)
 Showing inherited helm actions on project files.
 
+<hr>
+
+![helm-project-search-in-buffer](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-search-in-buffer.gif?raw=true)
+Narrowing across open project buffers to those which contain "helm-project-source".
+
 
 ## Commands
 `helm-project-list-projects` - project-switch-project
