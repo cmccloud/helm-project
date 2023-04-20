@@ -5,6 +5,11 @@ This package provides a Helm interface for the built in project.el Emacs library
 </p>
 <hr>
 
+## Features
+* Inherits from included helm sources. e.g. act on project buffers using any of the helm buffer actions, open project-files with root as you could when using helm file actions.
+
+* Supports project.el external roots. If your project definition supports multiple roots, search across them all at once.
+
 ## Links
 [Helm Homepage](https://github.com/emacs-helm/helm)
 
