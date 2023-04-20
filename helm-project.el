@@ -1,6 +1,6 @@
 ;; helm-project.el --- Helm source for project management. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2021 Christopher McCloud
+;; Copyright (C) 2020-2023 Christopher McCloud
 
 ;; This file is NOT part of GNU Emacs.
 
