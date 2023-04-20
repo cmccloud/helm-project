@@ -24,7 +24,9 @@ Using `helm-project` to find a project file.
 <hr>
 
 ![helm-project-grep-ag](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-grep-ag.gif?raw=true)
-Using `helm-project-grep-ag` within `helm-project` to locate a definition within a project (bound by default to `M-g a` when within a helm buffer, as per helm conventions).
+Using `helm-project-grep-ag` within `helm-project` to locate a definition within a project.
+
+Bound by default to `M-g a` when within a helm buffer, as per helm conventions.
 
 <hr>
 
@@ -39,9 +41,11 @@ Showing inherited helm actions on project files.
 
 `helm-project-buffers` - project-switch-to-buffer
 
-`helm-project-grep-ag` - project-find-regexp
+`helm-project-grep-ag` - project-find-regexp. May also be called from within a helm-project-* buffer with `M-g a`.
 
 `helm-project` - This is the main entry point, and combines above three helm sources into a single interface.
+
+`helm-project-toggle-external-flag` - Only bound when within a helm-project-* buffer, used to toggle search space between project root directory, and project root directory + external roots. Bound to `C-c a` by default.
 
 ## Installing
 Clone this repository and install using `use-package`
