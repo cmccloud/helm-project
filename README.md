@@ -26,6 +26,11 @@ Using `helm-project` to find a project file.
 ![helm-project-grep-ag](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-grep-ag.gif?raw=true)
 Using `helm-project-grep-ag` within `helm-project` to locate a definition within a project (bound by default to `M-g a` when within a helm buffer, as per helm conventions).
 
+<hr>
+
+![helm-project-file-actions](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-file-actions.gif?raw=true)
+Showing inherited helm actions on project files.
+
 
 ## Commands
 `helm-project-list-projects` - project-switch-project
