@@ -50,7 +50,8 @@
     (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
     (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
     (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
-    map))
+    map)
+  "Keymap used in `helm-project-files' sources.")
 
 (defvar helm-project-buffer-map
   (let ((map (make-sparse-keymap)))
@@ -58,7 +59,8 @@
     (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
     (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
     (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
-    map))
+    map)
+  "Keymap used in `helm-project-buffers' sources.")
 
 (defvar helm-project-projects-map
   (let ((map (make-sparse-keymap)))
@@ -66,9 +68,11 @@
     (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
     (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
     (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
-    map))
+    map)
+  "Keymap used in `helm-project-list-projects' sources.")
 
 (defun helm-project--project-buffer-list ()
+  "Return the list of current `project-buffers'."
   (let ((visible-bufs (helm-buffers-get-visible-buffers))
         (project-root-bufs (project-buffers (project-current)))
         (external-roots-bufs
@@ -78,7 +82,7 @@
 			   (project-buffers
 			    (project-current nil root))))
 		       (project-external-roots (project-current))))))
-    (cl-loop for buf in (append project-root-bufs external-roots-bufs) 
+    (cl-loop for buf in (append project-root-bufs external-roots-bufs)
              ;; Divide project buffers into visible and not-visible groups
              when (memq (buffer-name buf) visible-bufs)
              collect (buffer-name buf) into visible-in-project
@@ -90,6 +94,9 @@
                                      other-in-project))))
 
 (defun helm-project-toggle-external-flag ()
+  "Toggle whether to include `project-external-roots'.
+
+Affects both `helm-project-files' and `helm-project-buffers'."
   (interactive)
   (with-helm-alive-p
     (setq helm-project-external-flag (not helm-project-external-flag))
@@ -98,11 +105,18 @@
 		     (if helm-project-external-flag "True" "False")))))
 
 (defun helm-project-find-files ()
+  "Return the list of current project files.
+
+Calls `project-files' or `project-external-roots' depending on state of
+`helm-project-external-flag'."
   (let* ((pc (project-current))
 	 (ext (when helm-project-external-flag (project-external-roots pc))))
     (ignore-errors (project-files pc ext))))
 
 (defun helm-project-grep-ag (arg)
+  "Preconfigured ‘helm’ for searching with Ag/RG/Grep in the current project’.
+With prefix ARG prompt for type if available with your Ag/RG version.
+version."
   (interactive "P")
   (let* ((pc (project-current))
 	 (ext (when helm-project-external-flag
@@ -112,24 +126,28 @@
       (helm-do-grep-ag arg))))
 
 (defun helm-project-grep-ag-action (_c)
+  "Used internally by `helm-project-do-grep-ag'."
   (helm-project-grep-ag helm-current-prefix-arg))
 
 (defun helm-project-do-grep-ag ()
+  "Call `helm-project-grep-ag' from `helm' session."
   (interactive)
   (with-helm-alive-p
     (helm-exit-and-execute-action 'helm-project-grep-ag-action)))
 
 (defun helm-project-switch-to-project (candidate)
+  "Select or create new project, depending on value of CANDIDATE."
   (let* ((dir (if (string-equal candidate "* Select New Project *")
 		  (read-directory-name "Select Project Directory")
 		candidate))
 	 (pr (project--find-in-directory dir)))
     (if pr (project-remember-project pr)
-      (project--remove-from-project-list dir))
+      (project--remove-from-project-list dir "Project Removed"))
     (with-helm-default-directory dir
       (helm-project))))
 
 (defun helm-project-get-projects ()
+  "Get list of known projects for use in `helm-project-list-projects'."
   (append (with-temp-buffer
 	    (insert-file-contents project-list-file)
 	    (read (current-buffer)))
@@ -145,11 +163,15 @@
     "A function with no arguments to create buffer list.")))
 
 (cl-defmethod helm--setup-source ((source helm-project-buffer-source))
+  "Prepare slots and handle slot errors before creating SOURCE.
+
+Appends `helm-project-buffer-source' specific commands to inherited
+`helm-type-buffer' commands.'"
   (cl-call-next-method)
   (setf (slot-value source 'action)
         (append (symbol-value (slot-value source 'action))
-                (helm-make-actions "Search project with Grep or AG `M-g a' " 
-				   'helm-project-grep-ag-action
+                (helm-make-actions "Search project with Grep or AG `M-g a'."
+                                   'helm-project-grep-ag-action
 				   "Toggle external roots `C-c a'."
 				   (lambda (_c)
 				     (helm-project-toggle-external-flag)))))
@@ -163,6 +185,10 @@
 			       (helm-basename candidate) candidate)))))
 
 (cl-defmethod helm--setup-source ((source helm-project-file-source))
+  "Prepare slots and handle slot errors before creating SOURCE.
+
+Appends `helm-project-file-source' specific commands to inherited
+`helm-type-file' commands.'"
   (cl-call-next-method)
   (setf (slot-value source 'action)
         (append (symbol-value (slot-value source 'action))
@@ -182,39 +208,48 @@
 	       'helm-project-switch-to-project
 	       "Search project with Grep or AG `M-g a' "
 	       'helm-project-grep-ag-action))
-   (keymap :initform helm-project-projects-map)))
+   (keymap :initform 'helm-project-projects-map)))
 
 ;;; User Facing Commands
 
 ;;;###autoload
 (defun helm-project-list-projects ()
+  "`helm' for working with known projects.
+
+Also see `helm-project'."
   (interactive)
   (unless (bound-and-true-p helm-project-source-projects)
     (setq helm-project-source-projects
 	  (helm-make-source "Projects"
-	      helm-project-project-source)))
+	      'helm-project-project-source)))
   (helm
    :buffer "*helm projects*"
    :sources '(helm-project-source-projects)))
 
 ;;;###autoload
 (defun helm-project-files ()
+  "`helm' for working with project files.
+
+Also see `helm-project'."
   (interactive)
   (unless (bound-and-true-p helm-project-source-files)
     (setq helm-project-source-files
 	  (helm-make-source "Project Files"
-	      helm-project-file-source)))
+	      'helm-project-file-source)))
   (helm
    :buffer "*helm project files*"
    :sources '(helm-project-source-files)))
 
 ;;;###autoload
 (defun helm-project-buffers ()
+  "`helm' for working with project buffers.
+
+Also see `helm-project'."
   (interactive)
   (unless (bound-and-true-p helm-project-source-buffers)
     (setq helm-project-source-buffers
 	  (helm-make-source "Project Buffers"
-	      helm-project-buffer-source)))
+	      'helm-project-buffer-source)))
   (helm
    :buffer "*helm project buffers*"
    :sources '(helm-project-source-buffers)
@@ -222,19 +257,20 @@
 
 ;;;###autoload
 (defun helm-project ()
+  "`helm' for working with projects."
   (interactive)
   (unless (bound-and-true-p helm-project-source-files)
     (setq helm-project-source-files
 	  (helm-make-source "Project Files"
-	      helm-project-file-source)))
+	      'helm-project-file-source)))
   (unless (bound-and-true-p helm-project-source-buffers)
     (setq helm-project-source-buffers
 	  (helm-make-source "Project Buffers"
-	      helm-project-buffer-source)))
+	      'helm-project-buffer-source)))
   (unless (bound-and-true-p helm-project-source-projects)
     (setq helm-project-source-projects
 	  (helm-make-source "Projects"
-	      helm-project-project-source)))
+	      'helm-project-project-source)))
   (helm
    :buffer "*Helm Project*"
    :sources '(helm-project-source-buffers
@@ -247,6 +283,6 @@
 
 (provide 'helm-project)
 
-;; helm-project.el ends here
+;;; helm-project.el ends here
 
 
