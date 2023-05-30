@@ -165,13 +165,13 @@ version."
     :initform #'helm-project--project-buffer-list
     :custom function
     :documentation
-    "A function with no arguments to create buffer list.")))
+    "A function with no arguments to create buffer list."))
+  "A class for project buffers in helm.")
 
 (cl-defmethod helm--setup-source ((source helm-project-buffer-source))
   "Prepare slots and handle slot errors before creating SOURCE.
 
-Appends `helm-project-buffer-source' specific commands to inherited
-`helm-type-buffer' commands.'"
+Appends project buffer specific commands to inherited helm buffer commands.'"
   (cl-call-next-method)
   (setf (slot-value source 'action)
         (append (symbol-value (slot-value source 'action))
@@ -187,13 +187,13 @@ Appends `helm-project-buffer-source' specific commands to inherited
     :initform 'helm-project-find-files)
    (match-part :initform (lambda (candidate)
 			   (if helm-ff-transformer-show-only-basename
-			       (helm-basename candidate) candidate)))))
+			       (helm-basename candidate) candidate))))
+  "A class for project files in helm.")
 
 (cl-defmethod helm--setup-source ((source helm-project-file-source))
   "Prepare slots and handle slot errors before creating SOURCE.
 
-Appends `helm-project-file-source' specific commands to inherited
-`helm-type-file' commands.'"
+Appends project file specific commands to inherited helm file commands.'"
   (cl-call-next-method)
   (setf (slot-value source 'action)
         (append (symbol-value (slot-value source 'action))
