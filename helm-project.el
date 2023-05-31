@@ -55,7 +55,7 @@
     (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
     (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
     map)
-  "Base helm-project keymap.")
+  "Base `helm-project' keymap.")
 
 (defun helm-project--project-buffer-list ()
   "Return the list of current `project-buffers'."
