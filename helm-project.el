@@ -49,30 +49,32 @@
 
 (defvar helm-project-external-flag nil)
 
-(defvar helm-project-files-map
+(defvar helm-project-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-find-files-map)
     (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
     (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
     (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
+    map)
+  "Base helm-project keymap.")
+
+(defvar helm-project-files-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map
+     (make-composed-keymap helm-project-map helm-find-files-map))
     map)
   "Keymap used in `helm-project-files' sources.")
 
 (defvar helm-project-buffer-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-buffer-map)
-    (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
-    (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
-    (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
+    (set-keymap-parent map
+     (make-composed-keymap helm-project-map helm-buffer-map))
     map)
   "Keymap used in `helm-project-buffers' sources.")
 
 (defvar helm-project-projects-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "M-g a") #'helm-project-do-grep-ag)
-    (define-key map (kbd "C-c a") #'helm-project-toggle-external-flag)
-    (define-key map (kbd "C-x C-f") #'helm-quit-and-find-file)
+    (set-keymap-parent map
+     (make-composed-keymap helm-project-map helm-map))
     map)
   "Keymap used in `helm-project-list-projects' sources.")
 
