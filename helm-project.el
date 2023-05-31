@@ -57,27 +57,6 @@
     map)
   "Base helm-project keymap.")
 
-(defvar helm-project-files-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map
-     (make-composed-keymap helm-project-map helm-find-files-map))
-    map)
-  "Keymap used in `helm-project-files' sources.")
-
-(defvar helm-project-buffer-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map
-     (make-composed-keymap helm-project-map helm-buffer-map))
-    map)
-  "Keymap used in `helm-project-buffers' sources.")
-
-(defvar helm-project-projects-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map
-     (make-composed-keymap helm-project-map helm-map))
-    map)
-  "Keymap used in `helm-project-list-projects' sources.")
-
 (defun helm-project--project-buffer-list ()
   "Return the list of current `project-buffers'."
   (let ((visible-bufs (helm-buffers-get-visible-buffers))
@@ -182,7 +161,8 @@ Appends project buffer specific commands to inherited helm buffer commands.'"
 				   "Toggle external roots `C-c a'."
 				   (lambda (_c)
 				     (helm-project-toggle-external-flag)))))
-  (setf (slot-value source 'keymap) helm-project-buffer-map))
+  (setf (slot-value source 'keymap)
+        (make-composed-keymap helm-project-map helm-buffer-map)))
 
 (defclass helm-project-file-source (helm-source-sync helm-type-file)
   ((candidates
@@ -204,7 +184,8 @@ Appends project file specific commands to inherited helm file commands.'"
 				   "Toggle external roots. `C-c a'"
 				   (lambda (_c)
 				     (helm-project-toggle-external-flag)))))
-  (setf (slot-value source 'keymap) helm-project-files-map))
+  (setf (slot-value source 'keymap)
+        (make-composed-keymap helm-project-map helm-find-files-map)))
 
 (defclass helm-project-project-source (helm-source-sync)
   ((candidates
@@ -215,7 +196,7 @@ Appends project file specific commands to inherited helm file commands.'"
 	       'helm-project-switch-to-project
 	       "Search project with Grep or AG `M-g a' "
 	       'helm-project-grep-ag-action))
-   (keymap :initform 'helm-project-projects-map))
+   (keymap :initform (make-composed-keymap helm-project-map helm-map)))
   "A class for projects in helm.")
 
 ;;; User Facing Commands
