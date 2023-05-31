@@ -213,7 +213,8 @@ Appends project file specific commands to inherited helm file commands.'"
 	       'helm-project-switch-to-project
 	       "Search project with Grep or AG `M-g a' "
 	       'helm-project-grep-ag-action))
-   (keymap :initform 'helm-project-projects-map)))
+   (keymap :initform 'helm-project-projects-map))
+  "A class for projects in helm.")
 
 ;;; User Facing Commands
 
