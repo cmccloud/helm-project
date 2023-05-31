@@ -59,14 +59,18 @@ Set up keybindings as desired.
 
 ``` emacs-lisp
 (use-package helm-project
-  :load-path "/path/to/helm-project-repository"
+  :load-path "./site-lisp/helm-project"
   :bind (("C-x C-p" . helm-project)
 	 ("M-s p" . helm-project-grep-ag)
 	 ([remap project-find-regexp] . helm-project-grep-ag)
 	 ([remap project-switch-to-buffer] . helm-project-buffers)
-	 ([remap project-find-files] . helm-project-files)
-	 ([remap project-switch-project] . helm-project-list-projects)))
-
+	 ([remap project-find-file] . helm-project-files)
+	 ([remap project-switch-project] . helm-project-list-projects)
+	 :map helm-project-map
+         ;; Any changes to keybinds on the helm-project-map should be made
+         ;; before initializing the sources for the first time, i.e. before
+         ;; calling any of the `helm-project-*' commands.
+	 ("C-c s" . helm-project-grep-ag)))
 ```
 
 ## 
