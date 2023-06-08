@@ -64,10 +64,10 @@
         (external-roots-bufs
          (when helm-project-external-flag
            (seq-mapcat (lambda (root)
-			 (ignore-errors
-			   (project-buffers
-			    (project-current nil root))))
-		       (project-external-roots (project-current))))))
+                         (ignore-errors
+                           (project-buffers
+                            (project-current nil root))))
+                       (project-external-roots (project-current))))))
     (cl-loop for buf in (append project-root-bufs external-roots-bufs)
              ;; Divide project buffers into visible and not-visible groups
              when (memq (buffer-name buf) visible-bufs)
