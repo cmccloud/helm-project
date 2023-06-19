@@ -5,19 +5,17 @@ This package provides a Helm interface for the built in project.el Emacs library
 </p>
 <hr>
 
-## Notable Features
+# Notable Features
 * Inherits from built-in helm sources. e.g. act on project buffers using any of the helm buffer actions, open project files with root as you could when using helm file actions. Search within open project buffers using the `@` prefix, just as you could when using `helm-mini` or `helm-buffers-list`.
 
 * Supports project.el external roots: If your project definition supports multiple roots, search and act across all of them at once.
 
-## Installing
-Clone this repository and install using `use-package`
+# Installing
+Install `helm-project` directly from [MELPA](https://melpa.org/#/helm-project)
 
-Set up keybindings as desired.
-
+# Configuration
 ``` emacs-lisp
 (use-package helm-project
-  :load-path "./site-lisp/helm-project"
   :bind (("C-x C-p" . helm-project)
 	 ("M-s p" . helm-project-grep-ag)
 	 ([remap project-find-regexp] . helm-project-grep-ag)
@@ -31,7 +29,7 @@ Set up keybindings as desired.
 	 ("C-c s" . helm-project-grep-ag)))
 ```
 
-## Commands
+# Commands
 `helm-project-list-projects` - project-switch-project
 
 `helm-project-files` - project-find-files
@@ -44,7 +42,7 @@ Set up keybindings as desired.
 
 `helm-project-toggle-external-flag` - Only bound when within a helm-project-* buffer, used to toggle search space between project root directory, and project root directory + external roots. Bound to `C-c a` by default.
 
-## Examples
+# Examples
 ![helm-project-files](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project.gif?raw=true)
 Using `helm-project` to find a project file.
 
@@ -65,7 +63,7 @@ Showing inherited helm actions on project files.
 ![helm-project-search-in-buffer](https://github.com/cmccloud/helm-project/blob/master/examples/helm-project-search-in-buffer.gif?raw=true)
 Narrowing across open project buffers to those which contain "helm-project-source".
 
-## Links
+# Links
 [Helm Homepage](https://github.com/emacs-helm/helm)
 
 [Working with Projects - Emacs Manual](https://www.gnu.org/software/emacs/manual/html_node/emacs/Projects.html)
